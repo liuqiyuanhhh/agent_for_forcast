@@ -30,7 +30,7 @@ Return a concise evidence brief under {SEARCH_EVIDENCE_WORD_LIMIT} words with th
 - Key facts
 - Latest signals
 - Main uncertainties
-- Sources (3-6 links)
+- Sources (2-4 high-quality links)
 
 Be concrete and prioritize facts that could change the forecast.
 """

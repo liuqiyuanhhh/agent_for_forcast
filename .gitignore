@@ -21,3 +21,7 @@ venv/
 
 # Local notebooks
 playground.ipynb
+
+# Local setup notes
+ACCESS_ENV.md
+scripts/forecast_cluster.sh
