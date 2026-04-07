@@ -20,14 +20,6 @@ A lightweight forecasting agent that uses OpenAI web search + LLM reasoning to e
 - `events.sample.json`: sample input
 - `AGENT_OUTLINE.md`: design overview
 
-## Setup
-```bash
-cd /home/qiyuanliu/agent_for_forcast
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
 ## Environment
 Create `.env` in project root:
 ```bash
@@ -81,7 +73,3 @@ On skip/error:
   "rationale": "..."
 }
 ```
-
-## Notes
-- `.env` is git-ignored and should not be committed.
-- Local notebook/script helper files are intentionally git-ignored per project preference.
