@@ -1,0 +1,10 @@
+[
+  {
+    "event_ticker": "EVT-BTC-2026-12-31",
+    "market_ticker": "MKT-BTC-ABOVE-100K-2026",
+    "title": "Will Bitcoin close above $100,000 on December 31, 2026?",
+    "description": "Resolves YES if BTC/USD spot price is above 100,000 at 23:59:59 UTC on 2026-12-31.",
+    "category": "Financials",
+    "close_time": "2026-12-31T23:59:59Z"
+  }
+]
