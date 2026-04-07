@@ -4,8 +4,14 @@ from typing import Optional
 
 from openai import APIError, OpenAI
 
-from .config import PREDICTION_MAX_OUTPUT_TOKENS, PREDICTION_MODEL
+from .config import (
+    MODEL_WEIGHT,
+    PREDICTION_MAX_OUTPUT_TOKENS,
+    PREDICTION_MODEL,
+    USE_MARKET_PRIOR,
+)
 from .evidence import gather_openai_web_evidence
+from .kalshi import prior_from_event_fields, prior_from_kalshi_api
 from .prompting import build_prediction_prompt
 from .time_utils import is_closed
 
@@ -45,6 +51,34 @@ def _gather_hybrid_evidence(event: dict) -> Optional[str]:
     return gather_openai_web_evidence(client, event)
 
 
+def _blend_with_market_prior(result: dict, event: dict) -> dict:
+    """Blend model forecast with Kalshi market prior when available."""
+    if not USE_MARKET_PRIOR:
+        return result
+
+    p_model = result.get("p_yes")
+    if p_model is None:
+        return result
+
+    prior, source = prior_from_event_fields(event)
+    if prior is None:
+        prior, source = prior_from_kalshi_api(event)
+    if prior is None:
+        return result
+
+    p_final = MODEL_WEIGHT * p_model + (1.0 - MODEL_WEIGHT) * prior
+    p_final = max(0.01, min(0.99, p_final))
+
+    out = dict(result)
+    out["p_yes"] = p_final
+    if "rationale" in out:
+        out["rationale"] = (
+            f"{out['rationale']} Blended with Kalshi prior ({source})={prior:.2f} "
+            f"using model_weight={MODEL_WEIGHT:.2f}."
+        )
+    return out
+
+
 def predict(event: dict) -> dict:
     """Receive a prediction market event, return a probability estimate."""
     if is_closed(event.get("close_time")):
@@ -76,7 +110,8 @@ def predict(event: dict) -> dict:
         if not raw_text:
             return {"p_yes": None, "rationale": "No text response from model."}
 
-        return _parse_prediction_json(raw_text)
+        parsed = _parse_prediction_json(raw_text)
+        return _blend_with_market_prior(parsed, event)
 
     except json.JSONDecodeError as exc:
         return {

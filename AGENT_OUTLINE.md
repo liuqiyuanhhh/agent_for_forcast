@@ -38,7 +38,12 @@ Predict `p_yes` for a prediction-market event using:
   - `p_yes` in `[0.01, 0.99]`
   - `rationale` string
 
-5. Parse and clamp output
+5. Blend with market prior (Kalshi)
+- Reads prior from event fields when available (e.g., `yes_bid/yes_ask`).
+- Otherwise fetches by `market_ticker` from Kalshi API.
+- Blends: `p_final = MODEL_WEIGHT * p_model + (1 - MODEL_WEIGHT) * p_prior`.
+
+6. Parse and clamp output
 - Defensive parse and clamp ensure stable return shape.
 
 ## Main Modules
@@ -46,6 +51,7 @@ Predict `p_yes` for a prediction-market event using:
 - `src/evidence.py`: web evidence collection
 - `src/prompting.py`: forecasting prompt template
 - `src/time_utils.py`: close-time parsing/logic
+- `src/kalshi.py`: market prior extraction and Kalshi fetch
 - `src/config.py`: tunable model/token/word settings
 - `src/env_loader.py`: load `.env`
 - `run_agent.py`: CLI runner for local JSON events
@@ -58,6 +64,9 @@ From `.env`:
 - `OPENAI_SEARCH_EVIDENCE_WORD_LIMIT`
 - `OPENAI_SEARCH_MAX_OUTPUT_TOKENS`
 - `OPENAI_PREDICTION_MAX_OUTPUT_TOKENS`
+- `USE_MARKET_PRIOR`
+- `MODEL_WEIGHT`
+- `KALSHI_API_BASE_URL`
 
 ## Current Strengths
 - End-to-end working baseline
